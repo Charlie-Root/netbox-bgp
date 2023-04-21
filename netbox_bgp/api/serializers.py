@@ -123,16 +123,15 @@ class BGPSessionSerializer(NetBoxModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
-        if instance is not None:
-            if instance.peer_group:
-                for pol in instance.peer_group.import_policies.difference(instance.import_policies.all()):
-                    ret['import_policies'].append(
-                        NestedRoutingPolicySerializer(pol, context={'request': self.context['request']}).data
-                    )
-                for pol in instance.peer_group.export_policies.difference(instance.export_policies.all()):
-                    ret['export_policies'].append(
-                        NestedRoutingPolicySerializer(pol, context={'request': self.context['request']}).data
-                    )
+        if instance is not None and instance.peer_group:
+            for pol in instance.peer_group.import_policies.difference(instance.import_policies.all()):
+                ret['import_policies'].append(
+                    NestedRoutingPolicySerializer(pol, context={'request': self.context['request']}).data
+                )
+            for pol in instance.peer_group.export_policies.difference(instance.export_policies.all()):
+                ret['export_policies'].append(
+                    NestedRoutingPolicySerializer(pol, context={'request': self.context['request']}).data
+                )
         return ret
 
 

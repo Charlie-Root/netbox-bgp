@@ -354,25 +354,27 @@ class RoutingPolicyRule(NetBoxModel):
         return ActionChoices.colors.get(self.action)
 
     def get_match_custom(self):
-        # some kind of ckeck?
-        result = {}
-        if self.match_custom:
-            result = self.match_custom
-        return result
+        return self.match_custom if self.match_custom else {}
 
     @property
     def match_statements(self):
-        result = {}
-        # add communities
-        result.update(
-            {'community': list(self.match_community.all().values_list('value', flat=True))}
-        )
-        result.update(
-            {'ip address': [str(prefix_list) for prefix_list in self.match_ip_address.all().values_list('name', flat=True)]}
-        )
-        result.update(
-            {'ipv6 address': [str(prefix_list) for prefix_list in self.match_ipv6_address.all().values_list('name', flat=True)]}
-        )
+        result = {
+            'community': list(
+                self.match_community.all().values_list('value', flat=True)
+            )
+        }
+        result['ip address'] = [
+            str(prefix_list)
+            for prefix_list in self.match_ip_address.all().values_list(
+                'name', flat=True
+            )
+        ]
+        result['ipv6 address'] = [
+            str(prefix_list)
+            for prefix_list in self.match_ipv6_address.all().values_list(
+                'name', flat=True
+            )
+        ]
 
         custom_match = self.get_match_custom()
         # update community from custom
@@ -385,6 +387,4 @@ class RoutingPolicyRule(NetBoxModel):
 
     @property
     def set_statements(self):
-        if self.set_actions:
-            return self.set_actions
-        return {}
+        return self.set_actions if self.set_actions else {}
